@@ -5,9 +5,27 @@ import { TaskCard } from "./TaskCard"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const columns = [
-  { id: "TODO", label: "To Do", color: "bg-slate-100 border-slate-300 text-slate-700" },
-  { id: "IN_PROGRESS", label: "In Progress", color: "bg-blue-100 border-blue-300 text-blue-700" },
-  { id: "DONE", label: "Done", color: "bg-green-100 border-green-300 text-green-700" },
+  {
+    id: "TODO",
+    label: "To Do",
+    dot: "bg-slate-400",
+    header: "bg-slate-50 border-slate-200",
+    count: "bg-slate-200 text-slate-700",
+  },
+  {
+    id: "IN_PROGRESS",
+    label: "In Progress",
+    dot: "bg-blue-500",
+    header: "bg-blue-50 border-blue-200",
+    count: "bg-blue-200 text-blue-700",
+  },
+  {
+    id: "DONE",
+    label: "Done",
+    dot: "bg-green-500",
+    header: "bg-green-50 border-green-200",
+    count: "bg-green-200 text-green-700",
+  },
 ] as const
 
 interface KanbanBoardProps {
@@ -25,12 +43,12 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {columns.map((col) => (
           <div key={col.id} className="space-y-3">
-            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-10 w-full rounded-xl" />
             {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" />
+              <Skeleton key={i} className="h-36 w-full rounded-xl" />
             ))}
           </div>
         ))}
@@ -39,24 +57,27 @@ export function KanbanBoard({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
       {columns.map((col) => {
         const colTasks = tasks.filter((t) => t.status === col.id)
         return (
-          <div key={col.id} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium ${col.color}`}>
-                <span>{col.label}</span>
-                <span className="ml-1 bg-white bg-opacity-60 rounded-full px-1.5 py-0.5 text-xs">
-                  {colTasks.length}
-                </span>
+          <div key={col.id} className="flex flex-col gap-3">
+            {/* Column header */}
+            <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl border ${col.header}`}>
+              <div className="flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${col.dot}`} />
+                <span className="text-sm font-semibold text-gray-800">{col.label}</span>
               </div>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${col.count}`}>
+                {colTasks.length}
+              </span>
             </div>
 
-            <div className="space-y-3 min-h-[200px]">
+            {/* Cards */}
+            <div className="space-y-3 min-h-[180px]">
               {colTasks.length === 0 ? (
-                <div className="flex items-center justify-center h-32 border-2 border-dashed border-gray-200 rounded-lg">
-                  <p className="text-sm text-muted-foreground">No tasks</p>
+                <div className="flex flex-col items-center justify-center h-28 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                  <p className="text-xs text-gray-400 font-medium">No tasks</p>
                 </div>
               ) : (
                 colTasks.map((task) => (

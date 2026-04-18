@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query"
 import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -104,36 +103,49 @@ export function TaskFiltersBar({
     filters.search ||
     filters.myTasks
 
+  const statusStyles: Record<string, { active: string; inactive: string }> = {
+    TODO: { active: "bg-slate-700 text-white border-slate-700", inactive: "bg-white text-slate-600 border-slate-300 hover:border-slate-500" },
+    IN_PROGRESS: { active: "bg-blue-600 text-white border-blue-600", inactive: "bg-white text-blue-600 border-blue-300 hover:border-blue-500" },
+    DONE: { active: "bg-green-600 text-white border-green-600", inactive: "bg-white text-green-600 border-green-300 hover:border-green-500" },
+  }
+
+  const priorityStyles: Record<string, { active: string; inactive: string }> = {
+    LOW: { active: "bg-gray-700 text-white border-gray-700", inactive: "bg-white text-gray-600 border-gray-300 hover:border-gray-500" },
+    MEDIUM: { active: "bg-amber-600 text-white border-amber-600", inactive: "bg-white text-amber-600 border-amber-300 hover:border-amber-500" },
+    HIGH: { active: "bg-red-600 text-white border-red-600", inactive: "bg-white text-red-600 border-red-300 hover:border-red-500" },
+  }
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 p-4 bg-gray-50/80 rounded-xl border border-gray-200">
+      {/* Row 1: search + my-tasks toggle + clear */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search tasks..."
-            className="pl-9"
+            className="pl-9 h-9 bg-white border-gray-200 text-sm"
             value={searchInput}
             onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
 
         {showMyTasks && (
-          <div className="flex rounded-lg border overflow-hidden">
+          <div className="flex rounded-lg border border-gray-200 overflow-hidden bg-white">
             <button
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-xs font-semibold transition-colors ${
                 !filters.myTasks
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-white text-muted-foreground hover:bg-gray-50"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:bg-gray-50"
               }`}
               onClick={() => setFilters({ myTasks: false })}
             >
               All Tasks
             </button>
             <button
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-xs font-semibold transition-colors ${
                 filters.myTasks
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-white text-muted-foreground hover:bg-gray-50"
+                  ? "bg-gray-900 text-white"
+                  : "text-gray-500 hover:bg-gray-50"
               }`}
               onClick={() => setFilters({ myTasks: true })}
             >
@@ -143,45 +155,44 @@ export function TaskFiltersBar({
         )}
 
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearAll} className="text-muted-foreground">
-            <X className="h-4 w-4 mr-1" />
-            Clear
+          <Button variant="ghost" size="sm" onClick={clearAll} className="text-gray-500 hover:text-gray-900 h-9">
+            <X className="h-3.5 w-3.5 mr-1" />
+            Clear all
           </Button>
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <div className="flex flex-wrap gap-1">
-          {STATUS_OPTIONS.map((opt) => {
-            const active = filters.status?.includes(opt.value)
-            return (
-              <Badge
-                key={opt.value}
-                variant={active ? "default" : "outline"}
-                className="cursor-pointer select-none"
-                onClick={() => toggleStatus(opt.value)}
-              >
-                {opt.label}
-              </Badge>
-            )
-          })}
-        </div>
+      {/* Row 2: filter chips */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-1">Status</span>
+        {STATUS_OPTIONS.map((opt) => {
+          const active = filters.status?.includes(opt.value)
+          const s = statusStyles[opt.value]
+          return (
+            <button
+              key={opt.value}
+              className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${active ? s.active : s.inactive}`}
+              onClick={() => toggleStatus(opt.value)}
+            >
+              {opt.label}
+            </button>
+          )
+        })}
 
-        <div className="flex flex-wrap gap-1">
-          {PRIORITY_OPTIONS.map((opt) => {
-            const active = filters.priority?.includes(opt.value)
-            return (
-              <Badge
-                key={opt.value}
-                variant={active ? "default" : "outline"}
-                className="cursor-pointer select-none"
-                onClick={() => togglePriority(opt.value)}
-              >
-                {opt.label}
-              </Badge>
-            )
-          })}
-        </div>
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider ml-2 mr-1">Priority</span>
+        {PRIORITY_OPTIONS.map((opt) => {
+          const active = filters.priority?.includes(opt.value)
+          const s = priorityStyles[opt.value]
+          return (
+            <button
+              key={opt.value}
+              className={`text-xs font-medium px-3 py-1 rounded-full border transition-colors ${active ? s.active : s.inactive}`}
+              onClick={() => togglePriority(opt.value)}
+            >
+              {opt.label}
+            </button>
+          )
+        })}
 
         {currentUserRole === "ADMIN" && users.length > 0 && (
           <Select
@@ -190,7 +201,7 @@ export function TaskFiltersBar({
               setFilters({ assignedToId: !v || v === "all" ? undefined : v })
             }
           >
-            <SelectTrigger className="w-44 h-6 text-xs">
+            <SelectTrigger className="w-40 h-7 text-xs bg-white border-gray-200">
               <SelectValue placeholder="All assignees" />
             </SelectTrigger>
             <SelectContent>
@@ -204,18 +215,16 @@ export function TaskFiltersBar({
           </Select>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 ml-auto">
           <Input
             type="date"
-            className="h-6 text-xs w-36"
-            placeholder="Due after"
+            className="h-7 text-xs w-36 bg-white border-gray-200"
             value={filters.dueAfter ?? ""}
             onChange={(e) => setFilters({ dueAfter: e.target.value || undefined })}
           />
           <Input
             type="date"
-            className="h-6 text-xs w-36"
-            placeholder="Due before"
+            className="h-7 text-xs w-36 bg-white border-gray-200"
             value={filters.dueBefore ?? ""}
             onChange={(e) => setFilters({ dueBefore: e.target.value || undefined })}
           />

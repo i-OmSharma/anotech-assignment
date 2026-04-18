@@ -62,97 +62,83 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Welcome back, {session!.user.name}</p>
+        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-500 mt-0.5 text-sm">Welcome back, {session!.user.name}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.label}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className={cn("p-2 rounded-lg", stat.bg)}>
-                    <Icon className={cn("h-5 w-5", stat.color)} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-3">
+              <div className={cn("h-9 w-9 rounded-lg flex items-center justify-center", stat.bg)}>
+                <Icon className={cn("h-5 w-5", stat.color)} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{stat.label}</p>
+              </div>
+            </div>
           )
         })}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Completion rate</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-green-500 h-3 rounded-full transition-all"
-                style={{ width: `${completionRate}%` }}
-              />
-            </div>
-            <span className="text-sm font-medium text-muted-foreground w-12 shrink-0">
-              {completionRate}%
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {done} of {total} tasks completed
-          </p>
-        </CardContent>
-      </Card>
+      {/* Completion progress */}
+      <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-900">Completion Rate</h2>
+          <span className="text-sm font-bold text-gray-900">{completionRate}%</span>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-2.5">
+          <div
+            className="bg-green-500 h-2.5 rounded-full transition-all duration-500"
+            style={{ width: `${completionRate}%` }}
+          />
+        </div>
+        <p className="text-xs text-gray-500 mt-2">{done} of {total} tasks completed</p>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {recentTasks.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground text-sm">No tasks yet.</p>
-              <Link href="/tasks" className="text-primary hover:underline text-sm mt-2 inline-block">
-                Create your first task
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {recentTasks.map((task) => {
-                const overdueTask = isOverdue(task.dueDate) && task.status !== "DONE"
-                return (
-                  <Link key={task.id} href={`/tasks/${task.id}`}>
-                    <div className={cn(
-                      "flex items-center justify-between py-2 border-b last:border-0 hover:bg-gray-50 px-2 rounded transition-colors",
-                      overdueTask && "border-l-2 border-l-red-500 pl-3"
-                    )}>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{task.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Updated {formatDate(task.updatedAt)}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={cn("text-xs ml-4 shrink-0", statusConfig[task.status])}
-                      >
-                        {task.status.replace("_", " ")}
-                      </Badge>
+      {/* Recent activity */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h2 className="text-sm font-semibold text-gray-900">Recent Activity</h2>
+        </div>
+        {recentTasks.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-500 text-sm">No tasks yet.</p>
+            <Link href="/tasks" className="text-indigo-600 hover:underline text-sm mt-1 inline-block font-medium">
+              Create your first task →
+            </Link>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {recentTasks.map((task) => {
+              const overdueTask = isOverdue(task.dueDate) && task.status !== "DONE"
+              return (
+                <Link key={task.id} href={`/tasks/${task.id}`}>
+                  <div className={cn(
+                    "flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors",
+                    overdueTask && "border-l-[3px] border-l-red-500"
+                  )}>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{task.title}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Updated {formatDate(task.updatedAt)}
+                      </p>
                     </div>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    <span className={cn("text-xs px-2.5 py-1 rounded-full font-medium ml-4 shrink-0", statusConfig[task.status])}>
+                      {task.status === "IN_PROGRESS" ? "In Progress" : task.status === "TODO" ? "To Do" : "Done"}
+                    </span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

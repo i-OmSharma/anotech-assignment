@@ -39,35 +39,38 @@ export function TasksPageClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Tasks</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {tasks.length} task{tasks.length !== 1 ? "s" : ""}
+          <h1 className="text-xl font-bold text-gray-900">Tasks</h1>
+          <p className="text-gray-500 text-sm mt-0.5">
+            {isLoading ? "Loading..." : `${tasks.length} task${tasks.length !== 1 ? "s" : ""}`}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex rounded-lg border overflow-hidden">
-            <Button
-              variant={view === "kanban" ? "default" : "ghost"}
-              size="sm"
-              className="rounded-none"
+          {/* View toggle */}
+          <div className="flex rounded-lg border border-gray-200 overflow-hidden bg-white">
+            <button
+              className={`p-2 transition-colors ${view === "kanban" ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-50"}`}
               onClick={() => toggleView("kanban")}
+              title="Kanban view"
             >
               <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={view === "list" ? "default" : "ghost"}
-              size="sm"
-              className="rounded-none"
+            </button>
+            <button
+              className={`p-2 transition-colors ${view === "list" ? "bg-gray-900 text-white" : "text-gray-500 hover:bg-gray-50"}`}
               onClick={() => toggleView("list")}
+              title="List view"
             >
               <List className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
-          <Button onClick={() => setCreateOpen(true)} size="sm">
-            <Plus className="h-4 w-4 mr-1" />
-            New task
+          <Button
+            onClick={() => setCreateOpen(true)}
+            size="sm"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            New Task
           </Button>
         </div>
       </div>

@@ -1,23 +1,24 @@
 "use client"
 
 import { useState } from "react"
+import { CalendarDays, AlertCircle, ClipboardList } from "lucide-react"
 import { TaskWithUsers } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
-import { cn, formatDate, isOverdue } from "@/lib/utils"
+import { cn, formatDate, isOverdue, getInitials } from "@/lib/utils"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { TaskFormModal } from "./TaskForm"
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog"
 
 const statusConfig = {
-  TODO: { label: "To Do", className: "bg-slate-100 text-slate-700" },
-  IN_PROGRESS: { label: "In Progress", className: "bg-blue-100 text-blue-700" },
-  DONE: { label: "Done", className: "bg-green-100 text-green-700" },
+  TODO: { label: "To Do", dot: "bg-slate-400", chip: "bg-slate-100 text-slate-700" },
+  IN_PROGRESS: { label: "In Progress", dot: "bg-blue-500", chip: "bg-blue-100 text-blue-700" },
+  DONE: { label: "Done", dot: "bg-green-500", chip: "bg-green-100 text-green-700" },
 }
 
 const priorityConfig = {
-  LOW: { label: "Low", className: "bg-gray-100 text-gray-700" },
-  MEDIUM: { label: "Medium", className: "bg-yellow-100 text-yellow-700" },
-  HIGH: { label: "High", className: "bg-red-100 text-red-700" },
+  LOW: { label: "Low", className: "bg-gray-100 text-gray-600 border-gray-200" },
+  MEDIUM: { label: "Medium", className: "bg-amber-100 text-amber-700 border-amber-200" },
+  HIGH: { label: "High", className: "bg-red-100 text-red-700 border-red-200" },
 }
 
 interface TaskRowProps {
@@ -37,44 +38,56 @@ function TaskRow({ task, currentUserId, currentUserRole }: TaskRowProps) {
     <>
       <div
         className={cn(
-          "flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors",
-          overdue && "border-l-4 border-l-red-500"
+          "grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-4 px-5 py-3.5 hover:bg-gray-50 cursor-pointer transition-colors",
+          overdue && "border-l-[3px] border-l-red-500"
         )}
         onClick={() => setEditOpen(true)}
       >
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{task.title}</p>
+        {/* Title + description */}
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gray-900 truncate">{task.title}</p>
           {task.description && (
-            <p className="text-xs text-muted-foreground truncate mt-0.5">
-              {task.description}
-            </p>
+            <p className="text-xs text-gray-500 truncate mt-0.5">{task.description}</p>
           )}
         </div>
 
-        <Badge variant="outline" className={cn("text-xs shrink-0", status.className)}>
+        {/* Status chip */}
+        <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap shrink-0", status.chip)}>
+          <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", status.dot)} />
           {status.label}
-        </Badge>
+        </span>
 
-        <Badge variant="outline" className={cn("text-xs shrink-0", priority.className)}>
+        {/* Priority */}
+        <span className={cn("text-xs px-2 py-0.5 rounded-full border font-medium whitespace-nowrap shrink-0", priority.className)}>
           {priority.label}
-        </Badge>
+        </span>
 
-        {task.dueDate && (
-          <span
-            className={cn(
-              "text-xs shrink-0",
-              overdue ? "text-red-600 font-medium" : "text-muted-foreground"
-            )}
-          >
-            {formatDate(task.dueDate)}
-          </span>
-        )}
+        {/* Due date */}
+        <div className={cn(
+          "flex items-center gap-1 text-xs shrink-0 whitespace-nowrap",
+          task.dueDate ? (overdue ? "text-red-600 font-medium" : "text-gray-500") : "text-gray-300"
+        )}>
+          {task.dueDate ? (
+            <>
+              {overdue ? <AlertCircle className="h-3 w-3" /> : <CalendarDays className="h-3 w-3" />}
+              {formatDate(task.dueDate)}
+            </>
+          ) : (
+            <span>—</span>
+          )}
+        </div>
 
-        {canDelete && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <DeleteConfirmDialog taskId={task.id} taskTitle={task.title} />
-          </div>
-        )}
+        {/* Assignee + delete */}
+        <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+          {task.assignedTo && (
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className="text-xs bg-indigo-100 text-indigo-700 font-semibold">
+                {getInitials(task.assignedTo.name)}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          {canDelete && <DeleteConfirmDialog taskId={task.id} taskTitle={task.title} />}
+        </div>
       </div>
 
       <TaskFormModal
@@ -104,7 +117,7 @@ export function TaskList({
     return (
       <div className="space-y-2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-lg" />
+          <Skeleton key={i} className="h-14 w-full rounded-xl" />
         ))}
       </div>
     )
@@ -112,10 +125,12 @@ export function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="text-4xl mb-4">📋</div>
-        <h3 className="text-lg font-medium mb-1">No tasks found</h3>
-        <p className="text-muted-foreground text-sm">
+      <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-gray-200 rounded-xl">
+        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <ClipboardList className="h-6 w-6 text-gray-400" />
+        </div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-1">No tasks found</h3>
+        <p className="text-xs text-gray-500 max-w-xs">
           Adjust your filters or create a new task to get started.
         </p>
       </div>
@@ -123,15 +138,25 @@ export function TaskList({
   }
 
   return (
-    <div className="border rounded-lg divide-y overflow-hidden bg-white">
-      {tasks.map((task) => (
-        <TaskRow
-          key={task.id}
-          task={task}
-          currentUserId={currentUserId}
-          currentUserRole={currentUserRole}
-        />
-      ))}
+    <div className="rounded-xl border border-gray-200 overflow-hidden bg-white">
+      {/* Header row */}
+      <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-2.5 bg-gray-50 border-b border-gray-200">
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Task</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Priority</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Due</span>
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Assignee</span>
+      </div>
+      <div className="divide-y divide-gray-100">
+        {tasks.map((task) => (
+          <TaskRow
+            key={task.id}
+            task={task}
+            currentUserId={currentUserId}
+            currentUserRole={currentUserRole}
+          />
+        ))}
+      </div>
     </div>
   )
 }
