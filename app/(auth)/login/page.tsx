@@ -59,16 +59,7 @@ export default function LoginPage() {
           <blockquote className="text-gray-300 text-2xl font-light leading-relaxed mb-6">
             &ldquo;Stay organised. Ship faster. Win together.&rdquo;
           </blockquote>
-          <div className="space-y-3">
-            {["Kanban & list views", "Team task assignment", "Priority tracking & due dates"].map((f) => (
-              <div key={f} className="flex items-center gap-3 text-gray-400 text-sm">
-                <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
-                {f}
-              </div>
-            ))}
-          </div>
         </div>
-        <p className="text-gray-600 text-xs">Anotech India Solutions · SDE-1 Assignment</p>
       </div>
 
       {/* Right form panel */}
