@@ -5,14 +5,14 @@ import { CheckSquare, Clock, AlertCircle, ListTodo, TrendingUp } from "lucide-re
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatDate, isOverdue, cn } from "@/lib/utils"
-import { Prisma } from "@prisma/client"
+
 
 export default async function DashboardPage() {
   const session = await auth()
   const userId = session!.user.id
   const isAdmin = session!.user.role === "ADMIN"
 
-  const whereClause: Prisma.TaskWhereInput = isAdmin
+  const whereClause = isAdmin
     ? {}
     : { OR: [{ createdById: userId }, { assignedToId: userId }] }
 
