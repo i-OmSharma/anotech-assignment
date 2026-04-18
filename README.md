@@ -86,6 +86,6 @@ UPDATE "User" SET role = 'ADMIN' WHERE email = 'your@email.com';
 
 ## Author
 
-- **Name**: [Your Name]
-- **GitHub**: [github.com/username]
-- **LinkedIn**: [linkedin.com/in/username]
+- **Name**: [Om Sharma]
+- **GitHub**: [https://github.com/i-OmSharma]
+- **LinkedIn**: [https://www.linkedin.com/in/om-sharma-020b9a249/]
