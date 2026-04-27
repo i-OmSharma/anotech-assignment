@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  const [emailTaken, setEmailTaken] = useState(false)
 
   const {
     register,
@@ -25,6 +26,7 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterInput) {
     setLoading(true)
+    setEmailTaken(false)
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -32,6 +34,10 @@ export default function RegisterPage() {
         body: JSON.stringify(data),
       })
       const json = await res.json()
+      if (res.status === 409) {
+        setEmailTaken(true)
+        return
+      }
       if (!res.ok) {
         toast.error(json.error ?? "Registration failed")
         return
@@ -98,6 +104,14 @@ export default function RegisterPage() {
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email address</Label>
                 <Input id="email" type="email" placeholder="you@example.com" className="h-11" {...register("email")} />
                 {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                {emailTaken && (
+                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    A user is already registered with this email.{" "}
+                    <Link href="/login" className="font-semibold underline text-amber-900 hover:text-gray-900">
+                      Login to your account
+                    </Link>
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">

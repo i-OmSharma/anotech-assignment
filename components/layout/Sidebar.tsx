@@ -73,22 +73,22 @@ export function Sidebar() {
         <div className="px-3 space-y-1">
           <p className="text-gray-600 text-xs font-medium uppercase tracking-wider mb-2">Developer</p>
           <a
-            href="https://github.com/omsharma"
+            href="https://github.com/i-OmSharma"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-500 hover:text-white text-xs py-1 transition-colors"
           >
             <GithubIcon className="h-3.5 w-3.5" />
-            github.com/omsharma
+            github.com/i-OmSharma
           </a>
           <a
-            href="https://linkedin.com/in/omsharma"
+            href="https://www.linkedin.com/in/om-sharma-020b9a249/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-gray-500 hover:text-white text-xs py-1 transition-colors"
           >
             <LinkedinIcon className="h-3.5 w-3.5" />
-            linkedin.com/in/omsharma
+            linkedin.com/in/om-sharma-020b9a249
           </a>
         </div>
         {/* Logout */}

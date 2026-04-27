@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { Prisma } from "@prisma/client"
 import { hash } from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { RegisterSchema } from "@/lib/validations"
@@ -36,10 +37,19 @@ export async function POST(req: NextRequest) {
       { data: user, error: null },
       { status: 201 }
     )
-  } catch {
+  } catch (error) {
+    // Handle Prisma unique constraint violation (duplicate email)
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json<ApiResponse<null>>(
+        { data: null, error: "Email already registered" },
+        { status: 409 }
+      )
+    }
+    console.error('Register error:', error)
     return NextResponse.json<ApiResponse<null>>(
       { data: null, error: "Internal server error" },
       { status: 500 }
     )
   }
+
 }
